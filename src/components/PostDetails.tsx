@@ -16,16 +16,26 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   useEffect(() => {
-    setIsLoadingComments(true);
-    setCommentsError(false);
-    setIsFormVisible(false);
-    setComments([]);
+    const loadComments = async () => {
+      setIsLoadingComments(true);
+      setCommentsError(false);
+      setIsFormVisible(false);
+      setComments([]);
 
-    client
-      .get<Comment[]>(`/comments?postId=${post.id}`)
-      .then(setComments)
-      .catch(() => setCommentsError(true))
-      .finally(() => setIsLoadingComments(false));
+      try {
+        const loadedComments = await client.get<Comment[]>(
+          `/comments?postId=${post.id}`,
+        );
+
+        setComments(loadedComments);
+      } catch {
+        setCommentsError(true);
+      } finally {
+        setIsLoadingComments(false);
+      }
+    };
+
+    loadComments();
   }, [post.id]);
 
   const handleDeleteComment = (commentId: number) => {

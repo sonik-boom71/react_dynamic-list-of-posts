@@ -25,7 +25,7 @@ export const App = () => {
     client.get<User[]>('/users').then(setUsers);
   }, []);
 
-  const handleUserSelect = (user: User) => {
+  const handleUserSelect = async (user: User) => {
     if (user.id === selectedUser?.id) {
       return;
     }
@@ -36,11 +36,15 @@ export const App = () => {
     setPostsError(false);
     setIsLoadingPosts(true);
 
-    client
-      .get<Post[]>(`/posts?userId=${user.id}`)
-      .then(setPosts)
-      .catch(() => setPostsError(true))
-      .finally(() => setIsLoadingPosts(false));
+    try {
+      const loadedPosts = await client.get<Post[]>(`/posts?userId=${user.id}`);
+
+      setPosts(loadedPosts);
+    } catch {
+      setPostsError(true);
+    } finally {
+      setIsLoadingPosts(false);
+    }
   };
 
   const handlePostSelect = (post: Post) => {

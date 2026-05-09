@@ -17,7 +17,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
   const [bodyError, setBodyError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const hasNameError = !name.trim();
@@ -34,16 +34,22 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
 
     setIsLoading(true);
 
-    client
-      .post<Comment>('/comments', { postId, name, email, body })
-      .then(newComment => {
-        onAddComment(newComment);
-        setBody('');
-        setNameError(false);
-        setEmailError(false);
-        setBodyError(false);
-      })
-      .finally(() => setIsLoading(false));
+    try {
+      const newComment = await client.post<Comment>('/comments', {
+        postId,
+        name,
+        email,
+        body,
+      });
+
+      onAddComment(newComment);
+      setBody('');
+      setNameError(false);
+      setEmailError(false);
+      setBodyError(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
