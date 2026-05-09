@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Comment } from '../types/Comment';
 import { client } from '../utils/fetchClient';
@@ -193,4 +194,9 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
       </div>
     </form>
   );
+};
+
+NewCommentForm.propTypes = {
+  postId: PropTypes.number.isRequired,
+  onAddComment: PropTypes.func.isRequired,
 };
